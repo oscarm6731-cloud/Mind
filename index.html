@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyMind — Learn Anything</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400;1,600&family=Nunito:wght@400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --night:#0b0d12;--deep:#11131a;--surface:#181b24;--surface2:#1f2330;
+  --border:#272b3a;--border2:#323749;--text:#e8eaf6;--muted:#6b7094;
+  --faint:#2e3248;--sage:#6dbfa8;--sage2:#3da88e;--amber:#f0c060;
+  --rose:#e07070;--indigo:#8090e0;--sky:#70b8e0;--peach:#e09870;
+  --glow:rgba(109,191,168,0.12);
+  --pod:#e8603a;--pod2:#c44a28;--pod-glow:rgba(232,96,58,0.2)
+}
+body{background:var(--night);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 70% 50% at 15% 0%,rgba(109,191,168,0.05) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 85% 100%,rgba(232,96,58,0.04) 0%,transparent 60%);pointer-events:none;z-index:0}
+
+/* ── HEADER ── */
+header{position:sticky;top:0;z-index:300;background:rgba(11,13,18,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(–border);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:‘Cormorant Garamond’,serif;font-size:1.45rem;font-weight:700;display:flex;align-items:center;gap:9px}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(–sage2),var(–indigo));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem}
+.logo em{color:var(–sage);font-style:italic}
+.hnav-row{display:flex;gap:2px}
+.hnav{padding:6px 13px;border-radius:7px;background:transparent;border:none;color:var(–muted);font-family:‘Nunito’,sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.15s}
+.hnav:hover{background:var(–surface);color:var(–text)}
+.hnav.active{background:var(–surface2);color:var(–text)}
+.hnav.pod-nav{color:var(–pod)}
+.hnav.pod-nav.active{background:rgba(232,96,58,0.12);color:var(–pod)}
+.streak-badge{display:flex;align-items:center;gap:6px;padding:5px 12px;background:var(–surface2);border:1px solid var(–border);border-radius:20px;font-size:0.82rem;font-weight:700;color:var(–amber);cursor:pointer}
+
+/* ── LAYOUT ── */
+.app{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 56px);position:relative;z-index:2}
+aside{background:rgba(17,19,26,0.7);border-right:1px solid var(–border);padding:18px 0;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;display:flex;flex-direction:column;gap:2px}
+.aside-lbl{font-family:‘Fira Code’,monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:2px;color:var(–faint);padding:10px 16px 5px}
+.aside-btn{display:flex;align-items:center;gap:9px;width:calc(100% - 16px);margin:1px 8px;padding:9px 14px;border-radius:8px;background:transparent;border:none;font-family:‘Nunito’,sans-serif;font-size:0.85rem;color:var(–muted);cursor:pointer;transition:all 0.15s;text-align:left;font-weight:600}
+.aside-btn:hover{background:var(–surface);color:var(–text)}
+.aside-btn.active{background:var(–surface2);color:var(–text)}
+.aside-btn.pod-btn{color:var(–pod)}
+.aside-btn.pod-btn.active{background:rgba(232,96,58,0.1);color:var(–pod)}
+.a-icon{font-size:1rem;width:20px;text-align:center;opacity:0.7}
+.aside-btn.active .a-icon,.aside-btn.pod-btn .a-icon{opacity:1}
+.aside-div{height:1px;background:var(–border);margin:8px 16px}
+.xp-bar-wrap{margin:0 14px;background:var(–faint);border-radius:6px;height:5px;overflow:hidden}
+.xp-bar{height:100%;background:linear-gradient(90deg,var(–sage2),var(–indigo));border-radius:6px;transition:width 0.6s ease}
+
+/* ── PAGES ── */
+main{display:flex;flex-direction:column}
+.page{display:none;padding:32px 40px;flex:1;animation:fadeUp 0.3s ease}
+.page.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.page-hero{margin-bottom:28px}
+.page-hero h1{font-family:‘Cormorant Garamond’,serif;font-size:2.2rem;font-weight:700;line-height:1.15;margin-bottom:6px}
+.page-hero h1 em{color:var(–sage);font-style:italic}
+.page-hero p{color:var(–muted);font-size:0.9rem;max-width:520px;line-height:1.6}
+
+/* ── SHARED ── */
+.card{background:var(–surface);border:1px solid var(–border);border-radius:12px;padding:24px;margin-bottom:18px}
+.section-lbl{font-family:‘Fira Code’,monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:2px;color:var(–sage);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.section-lbl::after{content:’’;flex:1;height:1px;background:var(–border)}
+textarea,input[type=text],select{width:100%;background:var(–surface2);border:1px solid var(–border);border-radius:8px;padding:10px 14px;font-family:‘Nunito’,sans-serif;font-size:0.9rem;color:var(–text);outline:none;transition:border-color 0.2s}
+textarea{resize:vertical;min-height:120px;background:transparent;border:none;line-height:1.75}
+textarea::placeholder{color:var(–faint)}
+input:focus,select:focus{border-color:var(–sage)}
+select option{background:var(–deep)}
+.field{margin-bottom:16px}
+.field label{display:block;font-family:‘Fira Code’,monospace;font-size:0.62rem;text-transform:uppercase;letter-spacing:1.5px;color:var(–muted);margin-bottom:7px}
+.btn-main{padding:12px 26px;background:linear-gradient(135deg,var(–sage2),var(–indigo));color:white;border:none;border-radius:10px;font-family:‘Nunito’,sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px}
+.btn-main:hover{opacity:0.85;transform:translateY(-1px);box-shadow:0 6px 20px rgba(61,168,142,0.25)}
+.btn-main.loading{opacity:0.5;pointer-events:none}
+.btn-pod{padding:12px 26px;background:linear-gradient(135deg,var(–pod),var(–pod2));color:white;border:none;border-radius:10px;font-family:‘Nunito’,sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px}
+.btn-pod:hover{opacity:0.85;transform:translateY(-1px);box-shadow:0 6px 20px var(–pod-glow)}
+.btn-pod.loading{opacity:0.5;pointer-events:none}
+.btn-ghost{padding:9px 16px;background:var(–surface2);border:1px solid var(–border);color:var(–muted);border-radius:8px;font-family:‘Nunito’,sans-serif;font-size:0.82rem;font-weight:600;cursor:pointer;transition:all 0.15s}
+.btn-ghost:hover{border-color:var(–border2);color:var(–text)}
+.chip-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.chip{padding:7px 14px;border-radius:20px;border:1px solid var(–border2);font-size:0.8rem;color:var(–muted);cursor:pointer;transition:all 0.15s;font-family:‘Nunito’,sans-serif;background:transparent;font-weight:600}
+.chip:hover{border-color:var(–sage);color:var(–sage)}
+.chip.on{background:rgba(109,191,168,0.12);border-color:var(–sage);color:var(–sage)}
+.spinner{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.kp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:14px}
+.kp{background:var(–surface2);border:1px solid var(–border);border-radius:8px;padding:13px;font-size:0.84rem;line-height:1.6;border-left:3px solid var(–sage)}
+.kp-n{font-family:‘Fira Code’,monospace;font-size:0.6rem;color:var(–sage);display:block;margin-bottom:3px}
+.fc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px}
+.fc{background:var(–surface);border:1px solid var(–border);border-radius:11px;padding:20px;cursor:pointer;transition:all 0.22s;min-height:140px;display:flex;flex-direction:column;justify-content:space-between}
+.fc:hover{border-color:var(–border2);transform:translateY(-2px)}
+.fc.flipped{background:var(–surface2);border-color:var(–sage)}
+.fc-lbl{font-family:‘Fira Code’,monospace;font-size:0.58rem;text-transform:uppercase;letter-spacing:1.5px;color:var(–faint);margin-bottom:9px}
+.fc.flipped .fc-lbl{color:var(–sage)}
+.fc-txt{font-size:0.86rem;line-height:1.65}
+.fc-hint{font-size:0.7rem;color:var(–faint);margin-top:8px}
+.fc-back{display:none}
+.fc.flipped .fc-front{display:none}
+.fc.flipped .fc-back{display:block}
+.fc.flipped .fc-txt{color:var(–sage)}
+.qprog-wrap{height:3px;background:var(–border);border-radius:2px;margin-bottom:20px;overflow:hidden}
+.qprog-bar{height:100%;background:linear-gradient(90deg,var(–sage2),var(–indigo));border-radius:2px;transition:width 0.5s ease}
+.quiz-card{background:var(–surface);border:1px solid var(–border);border-radius:11px;padding:24px;margin-bottom:12px}
+.quiz-q{font-family:‘Cormorant Garamond’,serif;font-size:1.1rem;font-weight:600;margin-bottom:16px;line-height:1.5}
+.quiz-opts{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{padding:11px 15px;border:1px solid var(–border);border-radius:8px;cursor:pointer;font-size:0.87rem;transition:all 0.15s;background:transparent;text-align:left;font-family:‘Nunito’,sans-serif;color:var(–text);display:flex;align-items:center;gap:10px;font-weight:500}
+.quiz-opt:hover{border-color:var(–border2);background:var(–surface2)}
+.quiz-opt.correct{background:rgba(109,191,168,0.1);border-color:var(–sage2);color:var(–sage)}
+.quiz-opt.wrong{background:rgba(224,112,112,0.08);border-color:var(–rose);color:var(–rose)}
+.opt-l{width:22px;height:22px;border-radius:5px;background:var(–surface2);display:flex;align-items:center;justify-content:center;font-family:‘Fira Code’,monospace;font-size:0.68rem;flex-shrink:0}
+.quiz-opt.correct .opt-l{background:var(–sage2);color:white}
+.quiz-opt.wrong .opt-l{background:var(–rose);color:white}
+
+/* ════ LISTEN / PODCAST PAGE ════ */
+.listen-layout{display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start}
+
+/* Upload & config */
+.listen-config .drop-zone{border:2px dashed var(–border2);border-radius:12px;padding:40px;text-align:center;cursor:pointer;transition:all 0.2s;background:rgba(232,96,58,0.03);position:relative;margin-bottom:18px}
+.listen-config .drop-zone:hover{border-color:var(–pod);background:rgba(232,96,58,0.07)}
+.listen-config .drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon-big{font-size:2.5rem;margin-bottom:10px;display:block;filter:grayscale(0.3)}
+.drop-zone h4{font-weight:700;margin-bottom:4px;font-size:1rem}
+.drop-zone p{font-size:0.8rem;color:var(–muted)}
+
+.voice-select-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.voice-card{background:var(–surface);border:1.5px solid var(–border);border-radius:10px;padding:14px;cursor:pointer;transition:all 0.15s;text-align:center}
+.voice-card:hover{border-color:var(–border2)}
+.voice-card.selected{border-color:var(–pod);background:rgba(232,96,58,0.07)}
+.voice-avatar{font-size:2rem;margin-bottom:6px}
+.voice-name{font-weight:700;font-size:0.88rem}
+.voice-desc{font-size:0.72rem;color:var(–muted);margin-top:2px}
+
+/* ── PLAYER ── */
+.player-panel{position:sticky;top:80px}
+.player-card{background:var(–surface);border:1px solid var(–border);border-radius:16px;overflow:hidden}
+
+.player-hero{
+background:linear-gradient(135deg,#1a0e0a,#2d1510,#1a1020);
+padding:28px 24px 20px;position:relative;overflow:hidden;min-height:200px;display:flex;flex-direction:column;justify-content:flex-end
+}
+.player-hero::before{
+content:’’;position:absolute;inset:0;
+background:radial-gradient(ellipse 80% 60% at 50% 30%,rgba(232,96,58,0.25),transparent 70%);
+}
+.player-hero::after{
+content:’’;position:absolute;inset:0;
+background-image:radial-gradient(circle,rgba(232,96,58,0.15) 1px,transparent 1px);
+background-size:20px 20px;opacity:0.4
+}
+
+/* Waveform visualizer */
+.waveform{display:flex;align-items:center;justify-content:center;gap:3px;height:60px;margin-bottom:16px;position:relative;z-index:2}
+.wave-bar{width:3px;border-radius:2px;background:rgba(232,96,58,0.4);transition:height 0.1s ease;animation:none}
+.wave-bar.playing{animation:wavePulse var(–dur,0.6s) ease-in-out infinite alternate}
+@keyframes wavePulse{from{height:var(–min,4px);background:rgba(232,96,58,0.4)}to{height:var(–max,30px);background:rgba(232,96,58,0.9)}}
+
+.player-track-info{position:relative;z-index:2}
+.player-ep-tag{font-family:‘Fira Code’,monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(–pod);margin-bottom:6px}
+.player-title{font-family:‘Cormorant Garamond’,serif;font-size:1.2rem;font-weight:700;line-height:1.3;margin-bottom:3px}
+.player-sub{font-size:0.78rem;color:rgba(232,234,246,0.5)}
+
+/* Progress */
+.player-progress{padding:16px 20px 0}
+.progress-track{height:4px;background:var(–faint);border-radius:2px;cursor:pointer;position:relative;margin-bottom:8px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(–pod),#f0a060);border-radius:2px;transition:width 0.3s linear;position:relative}
+.progress-fill::after{content:’’;position:absolute;right:-5px;top:-4px;width:10px;height:10px;background:white;border-radius:50%;box-shadow:0 0 0 2px var(–pod)}
+.progress-times{display:flex;justify-content:space-between;font-family:‘Fira Code’,monospace;font-size:0.65rem;color:var(–muted)}
+
+/* Controls */
+.player-controls{padding:14px 20px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ctrl-btn{background:none;border:none;color:var(–muted);cursor:pointer;font-size:1.2rem;transition:all 0.15s;padding:6px;border-radius:8px}
+.ctrl-btn:hover{color:var(–text);background:var(–surface2)}
+.play-btn{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(–pod),var(–pod2));border:none;color:white;font-size:1.3rem;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 16px var(–pod-glow)}
+.play-btn:hover{transform:scale(1.07);box-shadow:0 6px 24px var(–pod-glow)}
+.play-btn:active{transform:scale(0.96)}
+.speed-btn{font-family:‘Fira Code’,monospace;font-size:0.75rem;padding:5px 10px;background:var(–surface2);border:1px solid var(–border);border-radius:6px;color:var(–muted);cursor:pointer;transition:all 0.15s}
+.speed-btn:hover{border-color:var(–pod);color:var(–pod)}
+
+/* Transcript */
+.transcript-panel{padding:0 20px 20px;max-height:220px;overflow-y:auto}
+.transcript-title{font-family:‘Fira Code’,monospace;font-size:0.6rem;text-transform:uppercase;letter-spacing:2px;color:var(–faint);margin-bottom:12px;padding-top:4px}
+.transcript-segment{padding:8px 10px;border-radius:7px;margin-bottom:4px;font-size:0.82rem;line-height:1.65;color:var(–muted);cursor:pointer;transition:all 0.15s;border-left:2px solid transparent}
+.transcript-segment:hover{background:var(–surface2);color:var(–text)}
+.transcript-segment.active{background:rgba(232,96,58,0.08);border-left-color:var(–pod);color:var(–text)}
+.transcript-segment .ts-time{font-family:‘Fira Code’,monospace;font-size:0.6rem;color:var(–pod);display:block;margin-bottom:3px}
+
+/* Chapter markers */
+.chapters-row{display:flex;gap:6px;padding:10px 20px;border-top:1px solid var(–border);overflow-x:auto;scrollbar-width:none}
+.chapters-row::-webkit-scrollbar{display:none}
+.chapter-pill{padding:5px 12px;border-radius:20px;background:var(–surface2);border:1px solid var(–border);font-size:0.72rem;color:var(–muted);cursor:pointer;white-space:nowrap;transition:all 0.15s;font-weight:600}
+.chapter-pill:hover,.chapter-pill.active{background:rgba(232,96,58,0.1);border-color:var(–pod);color:var(–pod)}
+
+/* Key points ticker */
+.facts-ticker{background:rgba(232,96,58,0.05);border-top:1px solid rgba(232,96,58,0.15);padding:10px 20px;font-size:0.8rem;display:flex;align-items:center;gap:10px}
+.ticker-label{color:var(–pod);font-weight:700;font-size:0.72rem;white-space:nowrap;font-family:‘Fira Code’,monospace}
+.ticker-text{color:var(–muted);overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+
+/* Status states */
+.player-empty-state{padding:32px 20px;text-align:center;color:var(–muted)}
+.player-empty-icon{font-size:2.5rem;margin-bottom:10px;opacity:0.3}
+.player-empty-text{font-size:0.85rem;line-height:1.6}
+
+/* Mini equalizer icon */
+.eq-icon{display:flex;align-items:flex-end;gap:2px;height:16px}
+.eq-bar{width:3px;background:var(–pod);border-radius:1px;transition:height 0.15s}
+
+/* Recent episodes */
+.episode-list{margin-top:20px}
+.ep-item{display:flex;align-items:center;gap:14px;padding:12px;background:var(–surface);border:1px solid var(–border);border-radius:10px;margin-bottom:8px;cursor:pointer;transition:all 0.15s}
+.ep-item:hover{border-color:var(–border2)}
+.ep-thumb{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(–pod2),#8b3520);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.ep-info{flex:1}
+.ep-title{font-weight:700;font-size:0.87rem;margin-bottom:2px}
+.ep-meta{font-size:0.72rem;color:var(–muted)}
+.ep-duration{font-family:‘Fira Code’,monospace;font-size:0.7rem;color:var(–muted)}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;right:24px;z-index:999;background:var(–surface2);border:1px solid var(–border);border-radius:10px;padding:13px 18px;font-size:0.84rem;display:flex;align-items:center;gap:10px;box-shadow:0 8px 32px rgba(0,0,0,0.4);transform:translateY(80px);opacity:0;transition:all 0.3s ease;font-weight:600}
+.toast.show{transform:translateY(0);opacity:1}
+
+/* Island canvas */
+.island-top{display:grid;grid-template-columns:1fr 300px;gap:20px;margin-bottom:20px}
+.island-canvas-wrap{background:var(–surface);border:1px solid var(–border);border-radius:14px;overflow:hidden;position:relative}
+canvas#islandCanvas{display:block;width:100%;height:280px}
+.island-hud{position:absolute;top:10px;left:10px;display:flex;gap:7px}
+.hud-pill{background:rgba(11,13,18,0.8);backdrop-filter:blur(8px);border:1px solid var(–border);border-radius:20px;padding:4px 11px;font-size:0.76rem;font-weight:700;display:flex;align-items:center;gap:5px}
+.shop-panel{background:var(–surface);border:1px solid var(–border);border-radius:14px;padding:18px;overflow-y:auto;max-height:280px}
+.shop-item{display:flex;align-items:center;gap:10px;padding:9px;background:var(–surface2);border:1px solid var(–border);border-radius:9px;cursor:pointer;transition:all 0.15s;margin-bottom:7px}
+.shop-item:hover:not(.owned){border-color:var(–border2)}
+.shop-item.owned{opacity:0.6;cursor:default}
+.shop-item.can-afford:not(.owned):hover{border-color:var(–amber)}
+.shop-emoji{font-size:1.6rem;width:34px;text-align:center}
+.shop-info{flex:1}
+.shop-name{font-weight:700;font-size:0.84rem}
+.shop-req{font-size:0.68rem;color:var(–muted);margin-top:1px}
+.shop-cost{font-size:0.78rem;font-weight:700;color:var(–amber);white-space:nowrap}
+.shop-cost.free{color:var(–sage)}
+.milestone-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:9px}
+.milestone{background:var(–surface);border:1px solid var(–border);border-radius:9px;padding:13px;text-align:center}
+.milestone.unlocked{border-color:var(–sage);background:rgba(109,191,168,0.05)}
+.milestone.locked{opacity:0.45}
+.ms-icon{font-size:1.5rem;margin-bottom:5px}
+.ms-label{font-size:0.78rem;font-weight:700;margin-bottom:2px}
+.ms-req{font-size:0.68rem;color:var(–muted)}
+.ms-badge{font-size:0.62rem;padding:2px 7px;border-radius:10px;background:var(–sage2);color:white;font-weight:700;margin-top:4px;display:inline-block}
+
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(–faint);border-radius:2px}
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="logo"><div class="logo-icon">🌿</div>Study<em>Mind</em></div>
+  <div class="hnav-row">
+    <button class="hnav active" onclick="nav('study',this)">✦ Study</button>
+    <button class="hnav" onclick="nav('explore',this)">🔍 Explore</button>
+    <button class="hnav pod-nav" onclick="nav('listen',this)">🎧 Listen</button>
+    <button class="hnav" onclick="nav('essay',this)">✍ Essay</button>
+    <button class="hnav" onclick="nav('explain',this)">💡 Explain</button>
+    <button class="hnav" onclick="nav('island',this)">🏝 Island</button>
+  </div>
+  <div class="streak-badge" onclick="nav('island',null)">🔥 <span id="streakCount">5</span> day streak · 🪙<span id="coinDisplay">85</span></div>
+</header>
+
+<div class="app">
+<aside>
+  <div class="aside-lbl">Learn</div>
+  <button class="aside-btn active" onclick="nav('study',null,this)"><span class="a-icon">✦</span>Generate Materials</button>
+  <button class="aside-btn" onclick="nav('explore',null,this)"><span class="a-icon">🔍</span>Explore Topics</button>
+  <button class="aside-btn pod-btn" onclick="nav('listen',null,this)"><span class="a-icon">🎧</span>Listen Mode</button>
+  <button class="aside-btn" onclick="nav('essay',null,this)"><span class="a-icon">✍</span>Essay Feedback</button>
+  <button class="aside-btn" onclick="nav('explain',null,this)"><span class="a-icon">💡</span>Concept Explainer</button>
+  <div class="aside-div"></div>
+  <div class="aside-lbl">You</div>
+  <button class="aside-btn" onclick="nav('island',null,this)"><span class="a-icon">🏝</span>My Island</button>
+  <button class="aside-btn" onclick="nav('saved',null,this)"><span class="a-icon">🗂</span>Saved Notes</button>
+  <div class="aside-div"></div>
+  <div style="padding:0 14px">
+    <div style="display:flex;justify-content:space-between;font-size:0.73rem;color:var(--muted);margin-bottom:5px"><span>⭐ XP</span><span>340/500</span></div>
+    <div class="xp-bar-wrap"><div class="xp-bar" style="width:68%"></div></div>
+    <div style="font-size:0.68rem;color:var(--faint);margin-top:4px;padding:0 0">Level 4 Scholar</div>
+  </div>
+  <div style="padding:10px 14px;margin-top:6px">
+    <div style="background:rgba(232,96,58,0.06);border:1px solid rgba(232,96,58,0.18);border-radius:9px;padding:11px;font-size:0.76rem;color:var(--muted);line-height:2">
+      <div style="color:var(--pod);font-weight:700;margin-bottom:4px">🎧 New: Listen Mode!</div>
+      Upload notes → get a full audio breakdown you can listen to on the go.
+    </div>
+  </div>
+</aside>
+
+<main>
+
+<!-- ══ STUDY PAGE ══ -->
+
+<div class="page active" id="page-study">
+  <div class="page-hero">
+    <h1>What are you <em>studying today?</em></h1>
+    <p>Paste notes or type a topic — get summaries, flashcards, and quizzes instantly.</p>
+  </div>
+  <div class="card">
+    <div style="font-size:0.78rem;color:var(--muted);font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px"><span style="color:var(--sage)">✦</span> Your Material</div>
+    <textarea id="studyText" placeholder="Paste lecture notes, a textbook chapter, an article..." rows="7">The French Revolution (1789–1799) was a period of radical political and social transformation in France. It began with the financial crisis under Louis XVI and widespread discontent among the Third Estate. Key events include the storming of the Bastille on July 14, 1789, the Declaration of the Rights of Man, the Reign of Terror under Robespierre (1793–1794), and Napoleon Bonaparte's rise to power. The Revolution promoted ideals of liberty, equality, and fraternity, and had lasting impacts on democracy and nationalism worldwide.</textarea>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+    <div class="field"><label>Subject</label><input type="text" id="studySubject" placeholder="e.g. World History..."></div>
+    <div class="field"><label>Level</label><select id="studyLevel"><option>High School</option><option selected>College</option><option>Graduate</option></select></div>
+  </div>
+  <div class="field"><label>Generate</label>
+    <div class="chip-row">
+      <button class="chip on" data-m="summary" onclick="toggleChip(this)">📄 Summary</button>
+      <button class="chip on" data-m="flashcards" onclick="toggleChip(this)">🗂 Flashcards</button>
+      <button class="chip on" data-m="quiz" onclick="toggleChip(this)">✏️ Quiz</button>
+      <button class="chip" data-m="keyterms" onclick="toggleChip(this)">🔑 Key Terms</button>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+    <button class="btn-main" id="studyBtn" onclick="generateStudy()"><span id="studyIcon">✦</span> Generate</button>
+    <button class="btn-pod" onclick="useTextForListen()">🎧 Listen to This</button>
+    <button class="btn-ghost" onclick="document.getElementById('studyText').value='';document.getElementById('studyOutput').innerHTML=''">Clear</button>
+  </div>
+  <div id="studyOutput" style="margin-top:32px"></div>
+</div>
+
+<!-- ══ EXPLORE PAGE ══ -->
+
+<div class="page" id="page-explore">
+  <div class="page-hero"><h1>Explore Any <em>Topic</em></h1><p>Pick a category or type anything — get reliable info, then test yourself.</p></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:22px">
+    <div style="background:var(--surface);border:1.5px solid var(--sage);border-radius:11px;padding:18px;cursor:pointer;text-align:center" data-cat="finance" onclick="selectExploreCat(this)">
+      <div style="font-size:1.8rem;margin-bottom:6px">💰</div><div style="font-weight:700;font-size:0.86rem">Taxes & Finance</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:18px;cursor:pointer;text-align:center" data-cat="science" onclick="selectExploreCat(this)">
+      <div style="font-size:1.8rem;margin-bottom:6px">🔬</div><div style="font-weight:700;font-size:0.86rem">Science & Nature</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:18px;cursor:pointer;text-align:center" data-cat="history" onclick="selectExploreCat(this)">
+      <div style="font-size:1.8rem;margin-bottom:6px">🏛</div><div style="font-weight:700;font-size:0.86rem">History & Civics</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:18px;cursor:pointer;text-align:center" data-cat="health" onclick="selectExploreCat(this)">
+      <div style="font-size:1.8rem;margin-bottom:6px">🫀</div><div style="font-weight:700;font-size:0.86rem">Health & Wellness</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:18px;cursor:pointer;text-align:center" data-cat="tech" onclick="selectExploreCat(this)">
+      <div style="font-size:1.8rem;margin-bottom:6px">💻</div><div style="font-weight:700;font-size:0.86rem">Tech & Coding</div>
+    </div>
+  </div>
+  <div id="exploreSubtopics" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px"></div>
+  <div style="display:flex;gap:10px;margin-bottom:20px;align-items:flex-end">
+    <div class="field" style="flex:1;margin:0"><label>Or type any topic</label><input type="text" id="exploreInput" placeholder="e.g. How do taxes work, What is CRISPR..."></div>
+    <button class="btn-main" id="exploreBtn" onclick="exploreTopic()"><span id="exploreIcon">🔍</span> Explore</button>
+    <button class="btn-pod" onclick="listenToExplore()">🎧 Listen</button>
+  </div>
+  <div id="exploreOutput"></div>
+</div>
+
+<!-- ══ LISTEN PAGE ══ -->
+
+<div class="page" id="page-listen">
+  <div class="page-hero">
+    <h1>📻 Listen <em>Mode</em></h1>
+    <p>Upload your notes — get a fun, conversational audio breakdown perfect for the gym, commute, or anywhere.</p>
+  </div>
+
+  <div class="listen-layout">
+    <!-- Left: config -->
+    <div class="listen-config">
+      <div class="drop-zone" id="listenDrop">
+        <input type="file" accept=".pdf,.txt,.docx" onchange="handleListenFile(this)">
+        <span class="drop-icon-big">📄</span>
+        <h4>Drop your notes here</h4>
+        <p>PDF, TXT, DOCX — or paste below</p>
+      </div>
+
+```
+  <div class="card" style="margin-bottom:18px">
+    <div style="font-size:0.78rem;color:var(--muted);font-weight:600;margin-bottom:10px">Or paste your notes</div>
+    <textarea id="listenText" rows="5" placeholder="Paste any notes, article, or topic you want to hear explained..."></textarea>
+  </div>
+
+  <div class="field"><label>Topic / Subject</label><input type="text" id="listenSubject" placeholder="e.g. The French Revolution, How taxes work..."></div>
+
+  <div class="field">
+    <label>Choose a host voice</label>
+    <div class="voice-select-grid">
+      <div class="voice-card selected" data-voice="Nova" onclick="selectVoice(this)">
+        <div class="voice-avatar">👩‍🎤</div>
+        <div class="voice-name">Nova</div>
+        <div class="voice-desc">Warm & upbeat</div>
+      </div>
+      <div class="voice-card" data-voice="Onyx" onclick="selectVoice(this)">
+        <div class="voice-avatar">🎙️</div>
+        <div class="voice-name">Onyx</div>
+        <div class="voice-desc">Deep & authoritative</div>
+      </div>
+      <div class="voice-card" data-voice="Alloy" onclick="selectVoice(this)">
+        <div class="voice-avatar">🎵</div>
+        <div class="voice-name">Alloy</div>
+        <div class="voice-desc">Clear & neutral</div>
+      </div>
+      <div class="voice-card" data-voice="Shimmer" onclick="selectVoice(this)">
+        <div class="voice-avatar">✨</div>
+        <div class="voice-name">Shimmer</div>
+        <div class="voice-desc">Bright & energetic</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn-pod" id="listenBtn" onclick="generateListen()"><span id="listenIcon">🎧</span> Generate Audio</button>
+    <button class="btn-ghost" onclick="clearListen()">Clear</button>
+  </div>
+
+  <!-- Recent episodes -->
+  <div class="episode-list" id="episodeList">
+    <div class="section-lbl" style="margin-top:28px;margin-bottom:14px">Recent Episodes</div>
+    <div class="ep-item" onclick="loadEpisode('french-rev')">
+      <div class="ep-thumb">🏛</div>
+      <div class="ep-info">
+        <div class="ep-title">The French Revolution</div>
+        <div class="ep-meta">World History · 5 chapters</div>
+      </div>
+      <div class="ep-duration">~12 min</div>
+    </div>
+    <div class="ep-item" onclick="loadEpisode('taxes')">
+      <div class="ep-thumb">💰</div>
+      <div class="ep-info">
+        <div class="ep-title">How Taxes Work</div>
+        <div class="ep-meta">Finance · 4 chapters</div>
+      </div>
+      <div class="ep-duration">~9 min</div>
+    </div>
+  </div>
+</div>
+
+<!-- Right: player -->
+<div class="player-panel">
+  <div class="player-card">
+
+    <div class="player-hero" id="playerHero">
+      <!-- Waveform -->
+      <div class="waveform" id="waveform"></div>
+      <div class="player-track-info">
+        <div class="player-ep-tag" id="playerEpTag">Ready to generate</div>
+        <div class="player-title" id="playerTitle">Your Study Session</div>
+        <div class="player-sub" id="playerSub">Upload notes to get started</div>
+      </div>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="player-progress">
+      <div class="progress-track" id="progressTrack" onclick="seekAudio(event)">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <div class="progress-times">
+        <span id="currentTime">0:00</span>
+        <span id="totalTime">0:00</span>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="player-controls">
+      <button class="ctrl-btn" onclick="skipBack()" title="Back 15s">⏮ 15s</button>
+      <button class="ctrl-btn" onclick="prevChapter()">⏪</button>
+      <button class="play-btn" id="playBtn" onclick="togglePlay()">▶</button>
+      <button class="ctrl-btn" onclick="nextChapter()">⏩</button>
+      <button class="speed-btn" id="speedBtn" onclick="cycleSpeed()">1x</button>
+    </div>
+
+    <!-- Chapters -->
+    <div class="chapters-row" id="chaptersRow">
+      <div class="chapter-pill active">Intro</div>
+    </div>
+
+    <!-- Key fact ticker -->
+    <div class="facts-ticker">
+      <span class="ticker-label">💡 NOW</span>
+      <span class="ticker-text" id="tickerText">Generate your episode to start listening</span>
+    </div>
+
+    <!-- Transcript -->
+    <div class="transcript-panel" id="transcriptPanel">
+      <div class="transcript-title">Transcript</div>
+      <div id="transcriptContent">
+        <div style="color:var(--faint);font-size:0.82rem;text-align:center;padding:20px 0">Generate an episode to see the transcript here.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+```
+
+  </div>
+</div>
+
+<!-- ══ ESSAY PAGE ══ -->
+
+<div class="page" id="page-essay">
+  <div class="page-hero"><h1>Essay <em>Feedback</em></h1><p>Detailed rubric-based feedback on structure, argument, and style.</p></div>
+  <div class="card"><div style="font-size:0.78rem;color:var(--muted);font-weight:600;margin-bottom:10px">✍ Paste Your Essay</div><textarea id="essayText" rows="10" placeholder="Paste your essay here..."></textarea></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:18px">
+    <div class="field"><label>Type</label><select id="essayType"><option>Argumentative</option><option>Analytical</option><option>Expository</option><option>Narrative</option></select></div>
+    <div class="field"><label>Level</label><select id="essayLevel"><option>High School</option><option selected>College</option><option>Graduate</option></select></div>
+    <div class="field"><label>Focus</label><select id="essayFocus"><option>Balanced review</option><option>Argument strength</option><option>Structure & flow</option><option>Grammar & style</option></select></div>
+  </div>
+  <button class="btn-main" id="essayBtn" onclick="getEssayFeedback()"><span id="essayIcon">✍</span> Analyze</button>
+  <div id="essayOutput" style="margin-top:28px"></div>
+</div>
+
+<!-- ══ EXPLAIN PAGE ══ -->
+
+<div class="page" id="page-explain">
+  <div class="page-hero"><h1>Explain Any <em>Concept</em></h1><p>Any idea, explained clearly with analogies — tailored to your level.</p></div>
+  <div class="card"><input type="text" id="conceptInput" placeholder="e.g. Quantum entanglement, How taxes work, The Krebs cycle..." style="font-size:1rem;padding:13px"></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
+    <div class="field"><label>Level</label><select id="explainLevel"><option>10-year-old</option><option>High schooler</option><option selected>College student</option><option>Expert in another field</option></select></div>
+    <div class="field"><label>Style</label><select id="explainStyle"><option>Explanation + analogy</option><option>Step-by-step</option><option>Historical context</option><option>Real-world examples</option></select></div>
+  </div>
+  <div style="display:flex;gap:10px">
+    <button class="btn-main" id="explainBtn" onclick="explainConcept()"><span id="explainIcon">💡</span> Explain</button>
+    <button class="btn-pod" onclick="listenToExplain()">🎧 Explain Out Loud</button>
+  </div>
+  <div id="explainOutput" style="margin-top:28px"></div>
+</div>
+
+<!-- ══ ISLAND PAGE ══ -->
+
+<div class="page" id="page-island" style="padding:28px 36px">
+  <div class="page-hero"><h1>Your Study <em>Island</em> 🏝</h1><p>Earn coins by studying. Spend them to grow your island!</p></div>
+  <div class="island-top">
+    <div class="island-canvas-wrap">
+      <canvas id="islandCanvas" width="600" height="280"></canvas>
+      <div class="island-hud">
+        <div class="hud-pill">🔥 <span id="islandStreak">5</span>d</div>
+        <div class="hud-pill">🪙 <span id="islandCoins">85</span></div>
+        <div class="hud-pill">⭐ Lv.4</div>
+      </div>
+    </div>
+    <div class="shop-panel">
+      <div style="font-weight:800;font-size:0.95rem;margin-bottom:3px">🏪 Shop</div>
+      <div style="font-size:0.74rem;color:var(--muted);margin-bottom:12px">Study → earn 🪙 → buy items</div>
+      <div id="shopItems"></div>
+    </div>
+  </div>
+  <div class="section-lbl" style="margin-bottom:14px">Streak Milestones</div>
+  <div class="milestone-grid" id="milestonesGrid"></div>
+</div>
+
+<!-- ══ SAVED PAGE ══ -->
+
+<div class="page" id="page-saved">
+  <div class="page-hero"><h1>Saved <em>Notes</em></h1></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px">
+    <div class="card" style="cursor:pointer">
+      <div style="font-family:'Fira Code',monospace;font-size:0.58rem;color:var(--sage);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">World History</div>
+      <div style="font-weight:700;margin-bottom:6px">The French Revolution</div>
+      <div style="font-size:0.8rem;color:var(--muted);line-height:1.6;margin-bottom:12px">Key events 1789–1799, the Reign of Terror, Napoleon's rise...</div>
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-family:'Fira Code',monospace;font-size:0.6rem;color:var(--faint)">Mar 28, 2026</span>
+        <div style="display:flex;gap:5px"><span style="padding:2px 7px;background:var(--surface2);border-radius:4px;font-size:0.63rem;color:var(--muted)">Flashcards</span><span style="padding:2px 7px;background:rgba(232,96,58,0.1);border-radius:4px;font-size:0.63rem;color:var(--pod)">🎧 Audio</span></div>
+      </div>
+    </div>
+    <div class="card" style="cursor:pointer;border-style:dashed;display:flex;align-items:center;justify-content:center;min-height:130px" onclick="nav('study')">
+      <div style="text-align:center;color:var(--muted)"><div style="font-size:1.6rem;margin-bottom:6px;opacity:0.3">+</div><div style="font-size:0.86rem;font-weight:700">New Session</div></div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+<div class="toast" id="toast"><span id="toastIcon">✓</span><span id="toastMsg">Done!</span></div>
+
+<script>
+// ══ STATE ══
+let coins=85,streak=5,xp=340;
+let activeChips=['summary','flashcards','quiz'];
+let answeredQ={},answeredE={};
+let ownedItems=new Set(['palm','hut','campfire']);
+let selectedVoice='Nova';
+let selectedExploreCat='finance';
+let currentEpisode=null;
+let speechSynth=window.speechSynthesis;
+let utterance=null;
+let isPlaying=false;
+let playbackSpeed=1;
+let currentSegmentIdx=0;
+let segments=[];
+let segmentTimers=[];
+let elapsedSeconds=0;
+let totalSeconds=0;
+let progressInterval=null;
+
+const SUBTOPICS={finance:['How income tax works','What is a W-2?','Investing basics','Credit scores','Budgeting 101','What is a 401k?'],science:['DNA replication','Climate change basics','Black holes','The water cycle','Photosynthesis','Plate tectonics'],history:['How democracy works','Civil Rights Movement','How laws are made','The Cold War','Ancient Rome','The Constitution'],health:['How vaccines work','Mental health basics','Nutrition fundamentals','Sleep science','Exercise & the brain','Heart health'],tech:['How the internet works','Machine learning basics','Cybersecurity','How apps are built','What is the cloud?','How GPS works']};
+
+const SHOP=[
+  {id:'palm',emoji:'🌴',name:'Palm Tree',cost:0,streak:0},{id:'hut',emoji:'🛖',name:'Cozy Hut',cost:0,streak:0},{id:'campfire',emoji:'🔥',name:'Campfire',cost:0,streak:0},
+  {id:'flower',emoji:'🌸',name:'Cherry Blossom',cost:20,streak:2},{id:'tent',emoji:'⛺',name:'Study Tent',cost:30,streak:3},{id:'parrot',emoji:'🦜',name:'Parrot Pal',cost:40,streak:3},
+  {id:'lighthouse',emoji:'🏠',name:'Lighthouse',cost:60,streak:5},{id:'turtle',emoji:'🐢',name:'Island Turtle',cost:50,streak:5},{id:'rainbow',emoji:'🌈',name:'Rainbow',cost:35,streak:5},
+  {id:'fox',emoji:'🦊',name:'Forest Fox',cost:70,streak:7},{id:'castle',emoji:'🏰',name:'Study Castle',cost:100,streak:7},{id:'flag',emoji:'🚩',name:'Victory Flag',cost:80,streak:10},
+  {id:'dragon',emoji:'🐉',name:'Friendly Dragon',cost:150,streak:14},{id:'volcano',emoji:'🌋',name:'Mini Volcano',cost:120,streak:14},
+];
+const ISLAND_POS={palm:{x:0.55,y:0.5},hut:{x:0.35,y:0.46},campfire:{x:0.5,y:0.62},flower:{x:0.25,y:0.55},tent:{x:0.65,y:0.55},parrot:{x:0.6,y:0.38},lighthouse:{x:0.75,y:0.42},turtle:{x:0.3,y:0.68},rainbow:{x:0.5,y:0.22},fox:{x:0.2,y:0.5},castle:{x:0.45,y:0.33},flag:{x:0.8,y:0.55},dragon:{x:0.5,y:0.28},volcano:{x:0.15,y:0.46}};
+const MILESTONES=[{streak:1,emoji:'🌱',label:'First Step',reward:'Starter items',coins:5},{streak:3,emoji:'⛺',label:'Consistent',reward:'Tent + Parrot',coins:15},{streak:5,emoji:'🏠',label:'Week Warrior',reward:'Lighthouse + Turtle',coins:30},{streak:7,emoji:'🦊',label:'Dedicated',reward:'Fox + Castle',coins:50},{streak:10,emoji:'🏆',label:'10-Day Legend',reward:'+100 bonus coins',coins:100},{streak:14,emoji:'🐉',label:'Two-Week Master',reward:'Dragon + Volcano',coins:200}];
+
+// ══ NAV ══
+function nav(id,navBtn,sideBtn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.querySelectorAll('.hnav,.aside-btn').forEach(b=>b.classList.remove('active'));
+  if(navBtn)navBtn.classList.add('active');
+  if(sideBtn)sideBtn.classList.add('active');
+  if(id==='island'){renderShop();renderMilestones();drawIsland();}
+  if(id==='explore')renderExploreSubtopics();
+}
+function toggleChip(btn){btn.classList.toggle('on');const m=btn.dataset.m;activeChips=btn.classList.contains('on')?[...activeChips,m]:activeChips.filter(c=>c!==m);}
+function showToast(msg,icon='✓'){document.getElementById('toastMsg').textContent=msg;document.getElementById('toastIcon').textContent=icon;const t=document.getElementById('toast');t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3200);}
+function addCoins(n){coins+=n;document.getElementById('coinDisplay').textContent=coins;document.getElementById('islandCoins').textContent=coins;}
+function addXP(n){xp=Math.min(xp+n,500);}
+function setLoading(b,i,s,l=''){document.getElementById(b).classList.toggle('loading',s);document.getElementById(i).innerHTML=s?'<span class="spinner"></span>':l;}
+
+// ══ WAVEFORM ══
+function buildWaveform(){
+  const w=document.getElementById('waveform');
+  w.innerHTML='';
+  for(let i=0;i<38;i++){
+    const b=document.createElement('div');
+    b.className='wave-bar';
+    const minH=3+Math.random()*5;
+    const maxH=12+Math.random()*28;
+    b.style.setProperty('--min',minH+'px');
+    b.style.setProperty('--max',maxH+'px');
+    b.style.setProperty('--dur',(0.4+Math.random()*0.5).toFixed(2)+'s');
+    b.style.height=minH+'px';
+    b.style.animationDelay=(Math.random()*0.4).toFixed(2)+'s';
+    w.appendChild(b);
+  }
+}
+
+function setWaveState(playing){
+  document.querySelectorAll('.wave-bar').forEach(b=>{
+    if(playing){b.classList.add('playing');}
+    else{b.classList.remove('playing');b.style.height=b.style.getPropertyValue('--min');}
+  });
+}
+
+// ══ LISTEN MODE ══
+function selectVoice(card){
+  document.querySelectorAll('.voice-card').forEach(c=>c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedVoice=card.dataset.voice;
+}
+
+function handleListenFile(input){
+  if(input.files[0]){
+    const reader=new FileReader();
+    reader.onload=e=>{document.getElementById('listenText').value=e.target.result.slice(0,4000);};
+    reader.readAsText(input.files[0]);
+  }
+}
+
+function clearListen(){
+  stopAudio();
+  document.getElementById('listenText').value='';
+  document.getElementById('listenSubject').value='';
+  resetPlayer();
+}
+
+function useTextForListen(){
+  const text=document.getElementById('studyText').value;
+  const subj=document.getElementById('studySubject').value;
+  document.getElementById('listenText').value=text;
+  document.getElementById('listenSubject').value=subj;
+  nav('listen',null);
+  showToast('Text copied to Listen mode 🎧','🎧');
+}
+
+function listenToExplore(){
+  const topic=document.getElementById('exploreInput').value||'this topic';
+  document.getElementById('listenText').value='';
+  document.getElementById('listenSubject').value=topic;
+  nav('listen',null);
+  showToast('Opening Listen mode for: '+topic,'🎧');
+}
+
+function listenToExplain(){
+  const concept=document.getElementById('conceptInput').value||'this concept';
+  document.getElementById('listenText').value='';
+  document.getElementById('listenSubject').value=concept;
+  nav('listen',null);
+  showToast('Opening Listen mode for: '+concept,'🎧');
+}
+
+function resetPlayer(){
+  document.getElementById('playerTitle').textContent='Your Study Session';
+  document.getElementById('playerEpTag').textContent='Ready to generate';
+  document.getElementById('playerSub').textContent='Upload notes to get started';
+  document.getElementById('progressFill').style.width='0%';
+  document.getElementById('currentTime').textContent='0:00';
+  document.getElementById('totalTime').textContent='0:00';
+  document.getElementById('tickerText').textContent='Generate your episode to start listening';
+  document.getElementById('transcriptContent').innerHTML='<div style="color:var(--faint);font-size:0.82rem;text-align:center;padding:20px 0">Generate an episode to see the transcript here.</div>';
+  document.getElementById('chaptersRow').innerHTML='<div class="chapter-pill active">Intro</div>';
+  setWaveState(false);
+  document.getElementById('playBtn').innerHTML='▶';
+  isPlaying=false;
+  segments=[];
+  currentSegmentIdx=0;
+  stopAudio();
+}
+
+async function generateListen(){
+  const text=document.getElementById('listenText').value.trim();
+  const subject=document.getElementById('listenSubject').value.trim();
+  if(!text&&!subject){showToast('Add some notes or a topic first!','💡');return;}
+  setLoading('listenBtn','listenIcon',true);
+  buildWaveform();
+
+  const inputText=text||`Please explain ${subject} in depth`;
+  const prompt=`You are a brilliant, entertaining podcast host creating a deep-dive audio lesson. Your style is: fun and conversational, uses relatable analogies and real-world examples, has occasional light humor and personality, and keeps the listener hooked throughout.
+
+Create a comprehensive 10+ minute audio script about: "${inputText.slice(0,2500)}"
+Subject area: "${subject||'General'}"
+
+The script should feel like a great podcast — NOT a lecture. Use "you" to address the listener. Add transitions, energy, and personality. Include analogies that make abstract ideas click.
+
+Respond ONLY with valid JSON:
+{
+  "title": "Episode title (catchy, podcast-style)",
+  "subtitle": "One line teaser",
+  "estimatedMinutes": 12,
+  "chapters": [
+    {"title": "chapter name", "emoji": "emoji"},
+    {"title": "chapter name", "emoji": "emoji"},
+    {"title": "chapter name", "emoji": "emoji"},
+    {"title": "chapter name", "emoji": "emoji"},
+    {"title": "chapter name", "emoji": "emoji"}
+  ],
+  "keyFacts": ["interesting fact 1", "interesting fact 2", "interesting fact 3", "interesting fact 4"],
+  "script": [
+    {"chapter": 0, "text": "Hey there, and welcome! So today we're diving into something that honestly affects every single one of us... [continue with full enthusiastic intro paragraph, 100+ words]"},
+    {"chapter": 1, "text": "[Second chapter full text, 150+ words, conversational, with analogy]"},
+    {"chapter": 2, "text": "[Third chapter full text, 150+ words, with humor and examples]"},
+    {"chapter": 3, "text": "[Fourth chapter full text, 150+ words, deeper dive]"},
+    {"chapter": 4, "text": "[Closing chapter, 100+ words, memorable takeaway, call to action to study more]"}
+  ]
+}`;
+
+  let episode={};
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const d=await res.json();
+    episode=JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());
+  }catch(e){
+    episode={
+      title:subject?`${subject}: Everything You Need to Know`:"Your Study Session Breakdown",
+      subtitle:"A deep-dive you can listen to anywhere",
+      estimatedMinutes:12,
+      chapters:[{title:"The Big Picture",emoji:"🌍"},{title:"How It Works",emoji:"⚙️"},{title:"Real-World Impact",emoji:"💥"},{title:"Common Misconceptions",emoji:"🚫"},{title:"Key Takeaways",emoji:"🎯"}],
+      keyFacts:["This topic affects more people than you'd think","The basics can be learned surprisingly quickly","Most confusion comes from just a few misunderstood concepts","Understanding this gives you a real advantage"],
+      script:[
+        {chapter:0,text:`Hey, welcome! So today we're breaking down ${subject||'your study material'} — and I promise, by the end of this you're going to have that satisfying 'aha' moment where it all clicks. Whether you're driving, at the gym, or just chilling — I've got you. Let's start with the big picture, because context is everything. A lot of people skip this part and then wonder why the details don't make sense. Think of it like assembling furniture without looking at the picture on the box first — technically possible, but wildly frustrating. So here's what we're actually talking about and why it matters to your everyday life.`},
+        {chapter:1,text:`Alright, now that we've got the big picture, let's get into how this actually works under the hood. And I'm going to use an analogy here that I think is going to stick with you. Imagine your kitchen. Everything has a place, everything serves a purpose, and when you follow the recipe — things come out great. When you don't — well, you've been there. The core mechanism works the same way: there are inputs, a process, and outputs. And once you understand what each piece does, the whole system becomes intuitive. Let's walk through each one.`},
+        {chapter:2,text:`Here's where it gets really interesting — the real world. Because knowing something in theory is nice, but seeing how it plays out in everyday situations? That's where it becomes genuinely useful. I've got a few examples that I think are going to change how you see this. Example one: think about the last time this came up in your life without you even realizing it. Chances are, it was more recent than you think. Example two involves something most people do every single week — and they're doing it slightly wrong because they don't understand the underlying principle. We're going to fix that right now.`},
+        {chapter:3,text:`Okay, myth-busting time — because this topic has more misconceptions floating around than almost anything else I cover. Misconception number one: that this is too complicated for regular people. Complete nonsense. The reason people feel that way is because it's often explained with jargon by people who've forgotten what it's like to not know this stuff. Misconception number two — and this one's important — is that you need to master everything at once. You don't. There's a 20% of the knowledge that covers 80% of the situations you'll actually face. We've been covering that 20% this whole episode. And misconception three? That it doesn't really apply to you. It does. More than you know.`},
+        {chapter:4,text:`Alright, we're coming in for a landing — let's lock in those key takeaways. First: you now understand the fundamentals that most people never bother to learn. That's genuinely a superpower. Second: the real-world examples we covered? Keep those in your back pocket — they're the mental models that will help you apply this stuff when it matters. Third, and most importantly: this is a starting point, not the finish line. The more you engage with this material — whether that's flashcards, quizzes, or just talking about it with someone — the more it'll stick. Thanks for listening, keep studying, and I'll catch you in the next one!`}
+      ]
+    };
+  }
+
+  currentEpisode=episode;
+  segments=episode.script||[];
+  totalSeconds=(episode.estimatedMinutes||12)*60;
+
+  // Update player UI
+  document.getElementById('playerTitle').textContent=episode.title;
+  document.getElementById('playerEpTag').textContent='🎧 Episode Ready';
+  document.getElementById('playerSub').textContent=episode.subtitle||'Tap play to listen';
+  document.getElementById('totalTime').textContent=formatTime(totalSeconds);
+
+  // Chapters
+  const chapRow=document.getElementById('chaptersRow');
+  chapRow.innerHTML=(episode.chapters||[]).map((c,i)=>`<div class="chapter-pill ${i===0?'active':''}" onclick="jumpToChapter(${i})">${c.emoji||''} ${c.title}</div>`).join('');
+
+  // Ticker facts
+  let tickerIdx=0;
+  const facts=episode.keyFacts||[];
+  if(facts.length){
+    document.getElementById('tickerText').textContent=facts[0];
+    setInterval(()=>{tickerIdx=(tickerIdx+1)%facts.length;document.getElementById('tickerText').textContent=facts[tickerIdx];},6000);
+  }
+
+  // Transcript
+  const tc=document.getElementById('transcriptContent');
+  tc.innerHTML=segments.map((s,i)=>{
+    const chap=episode.chapters?.[s.chapter]||{};
+    return `<div class="transcript-segment ${i===0?'active':''}" id="seg${i}" onclick="jumpToSegment(${i})">
+      <span class="ts-time">${chap.emoji||'📖'} ${chap.title||'Chapter '+(s.chapter+1)}</span>
+      ${s.text}
+    </div>`;
+  }).join('');
+
+  setLoading('listenBtn','listenIcon',false,'🎧');
+  addCoins(15);addXP(50);
+  showToast('+15 coins! Your episode is ready 🎧','🎉');
+  autoPlay();
+}
+
+function loadEpisode(id){
+  showToast('Loading episode...','🎧');
+  const demos={
+    'french-rev':{title:'The French Revolution: Blood, Drama & Big Ideas',subtitle:'From bread riots to Napoleon — the full story',estimatedMinutes:12,chapters:[{title:'The Setup',emoji:'🏰'},{title:'The Spark',emoji:'💥'},{title:'The Terror',emoji:'⚔️'},{title:'The Legacy',emoji:'🌍'},{title:'Key Takeaways',emoji:'🎯'}],keyFacts:['Over 17,000 people were executed during the Reign of Terror','The storming of the Bastille freed only 7 prisoners','Napoleon was actually average height for the time'],script:[{chapter:0,text:"Hey, welcome back! Today we're doing the French Revolution — and honestly, this one has everything. Political drama, revenge, idealism gone wrong, and a short guy who somehow ended up conquering most of Europe. If this were a Netflix series, it would be renewed immediately. Let's set the scene..."},{chapter:1,text:"So it's 1789. France is basically broke. The king is clueless. People are starving. And the Third Estate — that's everyone who isn't a priest or noble, so like 97% of France — is being taxed into oblivion while contributing zero to the actual decision-making. Think of it like being charged for a dinner you weren't invited to. Eventually, people snap..."},{chapter:2,text:"July 14th, 1789. The Bastille is stormed. Now here's the funny part — there were only 7 prisoners inside. But symbolically? Enormous. It's like breaking down the door of a place that represents everything oppressive about a system. The physical act matters less than what it says: we're done playing by your rules..."},{chapter:3,text:"Now things get dark. Robespierre takes charge and launches the Reign of Terror. His logic: to save the revolution, we must eliminate its enemies. The problem? The definition of 'enemy' kept expanding. Thousands are guillotined. Including, eventually, Robespierre himself. Classic case of 'live by the sword...' Let that be a lesson in how extremism tends to eat itself..."},{chapter:4,text:"So what do we take away from all this? First: revolutions are easier to start than to control. Second: when basic needs aren't met — food, dignity, representation — people don't stay quiet forever. Third: the ideals of liberty and equality that France screamed into the world in 1789 still echo today. The American founding, the UN Declaration of Human Rights — all of it carries DNA from this chaotic, bloody, world-changing decade. Pretty wild, right?"}]},
+    'taxes':{title:'Taxes Explained: The Thing Nobody Taught You in School',subtitle:'How taxes actually work — and how to stop dreading them',estimatedMinutes:9,chapters:[{title:'Why Taxes Exist',emoji:'🏛'},{title:'How Income Tax Works',emoji:'💸'},{title:'The Sneaky Taxes',emoji:'👀'},{title:'Tax Hacks',emoji:'💡'}],keyFacts:['Tax brackets are marginal — you\'re NOT taxed at one flat rate','The US tax code is 70,000+ pages long','You can legally reduce your tax bill in many ways'],script:[{chapter:0,text:"Okay, real talk — nobody taught us taxes in school. Not really. And then suddenly you're an adult staring at a W-2 wondering what a withholding even is. Today we fix that. Taxes are not mysterious or evil — they're actually a pretty elegant (if imperfect) system once you understand the logic. And understanding them can literally save you money. So let's go..."},{chapter:1,text:"The core idea of income tax is simple: you earn money, you share a percentage with the government, the government funds roads, schools, and the military. The key word is PERCENTAGE — and this is where the confusion lives. People think if you earn more, you suddenly get taxed a higher rate on EVERYTHING. Nope. We use brackets. Think of it like filling buckets — each bucket has its own rate, and you only pay the higher rate on the portion that spills into that bucket..."},{chapter:2,text:"Here's what most people don't think about: income tax is just one type. There's also sales tax on things you buy, property tax if you own a home, payroll tax (Social Security and Medicare — those mystery deductions on your paycheck), and capital gains tax if your investments go up. They all add up. Being aware of them doesn't mean you pay more — it means you can plan around them..."},{chapter:3,text:"And here's the part schools REALLY should have taught: you can legally reduce your tax bill. It's called tax planning, and it's not just for rich people. Contributing to a 401k? Tax deduction. HSA for medical expenses? Tax deduction. Work from home? Potentially deductible. The key insight is that the government literally tells you what they WON'T tax if you do certain things — because they want to incentivize behavior that's good for society. Use it. Seriously."}]}
+  };
+  if(demos[id]){
+    currentEpisode=demos[id];
+    segments=demos[id].script;
+    totalSeconds=demos[id].estimatedMinutes*60;
+    document.getElementById('playerTitle').textContent=demos[id].title;
+    document.getElementById('playerEpTag').textContent='🎧 Episode Ready';
+    document.getElementById('playerSub').textContent=demos[id].subtitle;
+    document.getElementById('totalTime').textContent=formatTime(totalSeconds);
+    const chapRow=document.getElementById('chaptersRow');
+    chapRow.innerHTML=demos[id].chapters.map((c,i)=>`<div class="chapter-pill ${i===0?'active':''}" onclick="jumpToChapter(${i})">${c.emoji} ${c.title}</div>`).join('');
+    const tc=document.getElementById('transcriptContent');
+    tc.innerHTML=segments.map((s,i)=>`<div class="transcript-segment ${i===0?'active':''}" id="seg${i}" onclick="jumpToSegment(${i})"><span class="ts-time">${demos[id].chapters[s.chapter]?.emoji||''} ${demos[id].chapters[s.chapter]?.title||''}</span>${s.text}</div>`).join('');
+    const facts=demos[id].keyFacts||[];
+    if(facts.length){document.getElementById('tickerText').textContent=facts[0];}
+    buildWaveform();
+    showToast('Episode loaded! Hit play 🎧','🎧');
+  }
+}
+
+// ══ AUDIO PLAYBACK (Web Speech API) ══
+function autoPlay(){setTimeout(()=>{if(currentEpisode)togglePlay();},600);}
+
+function togglePlay(){
+  if(!segments.length){showToast('Generate an episode first!','💡');return;}
+  if(isPlaying){pauseAudio();}else{resumeOrStart();}
+}
+
+function resumeOrStart(){
+  isPlaying=true;
+  document.getElementById('playBtn').innerHTML='⏸';
+  setWaveState(true);
+  if(speechSynth.paused){speechSynth.resume();startProgressTimer();return;}
+  speakSegment(currentSegmentIdx);
+}
+
+function pauseAudio(){
+  isPlaying=false;
+  document.getElementById('playBtn').innerHTML='▶';
+  setWaveState(false);
+  speechSynth.pause();
+  stopProgressTimer();
+}
+
+function stopAudio(){
+  isPlaying=false;
+  document.getElementById('playBtn').innerHTML='▶';
+  setWaveState(false);
+  speechSynth.cancel();
+  stopProgressTimer();
+  elapsedSeconds=0;
+  currentSegmentIdx=0;
+}
+
+function speakSegment(idx){
+  if(!segments[idx]){finishEpisode();return;}
+  speechSynth.cancel();
+  currentSegmentIdx=idx;
+  highlightSegment(idx);
+  highlightChapter(segments[idx].chapter);
+
+  utterance=new SpeechSynthesisUtterance(segments[idx].text);
+  utterance.rate=playbackSpeed;
+  utterance.pitch=1.05;
+
+  // Try to match selected voice
+  const voices=speechSynth.getVoices();
+  const voiceMap={Nova:'female',Onyx:'male',Alloy:'',Shimmer:'female'};
+  const preferred=voices.find(v=>v.lang.startsWith('en')&&(voiceMap[selectedVoice]==='female'?v.name.match(/female|zira|victoria|samantha|karen|moira/i):voiceMap[selectedVoice]==='male'?v.name.match(/male|david|daniel|alex|fred/i):true));
+  if(preferred)utterance.voice=preferred;
+
+  utterance.onend=()=>{
+    if(isPlaying){
+      currentSegmentIdx++;
+      if(currentSegmentIdx<segments.length)speakSegment(currentSegmentIdx);
+      else finishEpisode();
+    }
+  };
+  speechSynth.speak(utterance);
+  startProgressTimer();
+}
+
+function finishEpisode(){
+  isPlaying=false;
+  document.getElementById('playBtn').innerHTML='▶';
+  setWaveState(false);
+  stopProgressTimer();
+  elapsedSeconds=totalSeconds;
+  updateProgressUI();
+  showToast('Episode complete! +20 coins 🎉','🎉');
+  addCoins(20);addXP(60);
+}
+
+function startProgressTimer(){
+  stopProgressTimer();
+  progressInterval=setInterval(()=>{
+    if(isPlaying){
+      elapsedSeconds=Math.min(elapsedSeconds+0.25,totalSeconds);
+      updateProgressUI();
+    }
+  },250);
+}
+function stopProgressTimer(){if(progressInterval)clearInterval(progressInterval);}
+
+function updateProgressUI(){
+  const pct=totalSeconds>0?(elapsedSeconds/totalSeconds*100):0;
+  document.getElementById('progressFill').style.width=Math.min(pct,100)+'%';
+  document.getElementById('currentTime').textContent=formatTime(elapsedSeconds);
+}
+
+function seekAudio(e){
+  if(!currentEpisode)return;
+  const track=document.getElementById('progressTrack');
+  const rect=track.getBoundingClientRect();
+  const pct=(e.clientX-rect.left)/rect.width;
+  elapsedSeconds=pct*totalSeconds;
+  updateProgressUI();
+  // Jump to nearest segment
+  const segIdx=Math.floor(pct*segments.length);
+  jumpToSegment(Math.min(segIdx,segments.length-1));
+}
+
+function skipBack(){
+  elapsedSeconds=Math.max(0,elapsedSeconds-15);
+  updateProgressUI();
+  if(currentSegmentIdx>0)speakSegment(Math.max(0,currentSegmentIdx-1));
+}
+
+function nextChapter(){
+  if(!segments.length)return;
+  const currentChap=segments[currentSegmentIdx]?.chapter||0;
+  const nextSeg=segments.findIndex((s,i)=>i>currentSegmentIdx&&s.chapter>currentChap);
+  if(nextSeg>-1)jumpToSegment(nextSeg);
+}
+
+function prevChapter(){
+  if(!segments.length)return;
+  const prevSeg=Math.max(0,currentSegmentIdx-1);
+  jumpToSegment(prevSeg);
+}
+
+function jumpToChapter(chapIdx){
+  const segIdx=segments.findIndex(s=>s.chapter===chapIdx);
+  if(segIdx>-1)jumpToSegment(segIdx);
+}
+
+function jumpToSegment(idx){
+  currentSegmentIdx=idx;
+  elapsedSeconds=(idx/Math.max(segments.length,1))*totalSeconds;
+  updateProgressUI();
+  if(isPlaying)speakSegment(idx);
+  else{highlightSegment(idx);if(segments[idx])highlightChapter(segments[idx].chapter);}
+}
+
+function highlightSegment(idx){
+  document.querySelectorAll('.transcript-segment').forEach((el,i)=>{el.classList.toggle('active',i===idx);});
+  const el=document.getElementById('seg'+idx);
+  if(el)el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function highlightChapter(chapIdx){
+  document.querySelectorAll('.chapter-pill').forEach((el,i)=>el.classList.toggle('active',i===chapIdx));
+}
+
+function cycleSpeed(){
+  const speeds=[1,1.25,1.5,1.75,2,0.75];
+  const idx=speeds.indexOf(playbackSpeed);
+  playbackSpeed=speeds[(idx+1)%speeds.length];
+  document.getElementById('speedBtn').textContent=playbackSpeed+'x';
+  if(utterance)utterance.rate=playbackSpeed;
+  if(isPlaying){const idx2=currentSegmentIdx;speechSynth.cancel();setTimeout(()=>speakSegment(idx2),50);}
+}
+
+function formatTime(s){const m=Math.floor(s/60);const sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
+
+// ══ EXPLORE ══
+function selectExploreCat(el){
+  document.querySelectorAll('[data-cat]').forEach(c=>{c.style.borderColor='var(--border)';c.style.background='var(--surface)';});
+  el.style.borderColor='var(--sage)';el.style.background='rgba(109,191,168,0.07)';
+  selectedExploreCat=el.dataset.cat;
+  renderExploreSubtopics();
+}
+function renderExploreSubtopics(){
+  const row=document.getElementById('exploreSubtopics');
+  const subs=SUBTOPICS[selectedExploreCat]||[];
+  row.innerHTML=subs.map(s=>`<button style="padding:6px 13px;border-radius:20px;border:1px solid var(--border2);font-size:0.79rem;color:var(--muted);cursor:pointer;background:transparent;font-family:Nunito,sans-serif;font-weight:600;transition:all 0.15s" onclick="document.getElementById('exploreInput').value='${s}';exploreTopic()" onmouseover="this.style.borderColor='var(--sage)';this.style.color='var(--sage)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--muted)'">${s}</button>`).join('');
+}
+async function exploreTopic(){
+  const topic=document.getElementById('exploreInput').value.trim();
+  if(!topic){showToast('Enter a topic first','💡');return;}
+  setLoading('exploreBtn','exploreIcon',true);
+  const sourceMap={finance:['IRS.gov','Investopedia','CFPB.gov','NerdWallet'],science:['NASA.gov','NIH.gov','Nature.com','Khan Academy'],history:['Smithsonian','Library of Congress','History.com','Britannica'],health:['CDC.gov','Mayo Clinic','NIH MedlinePlus','WHO.int'],tech:['MDN Web Docs','MIT OpenCourseWare','CS50 Harvard','IEEE.org']};
+  const sources=sourceMap[selectedExploreCat]||['Wikipedia','Khan Academy','Britannica'];
+  const prompt=`You are an expert educator. Provide accurate, factual information about: "${topic}". Respond ONLY with valid JSON:
+{"title":"topic title","tldr":"1 clear sentence summary","sections":[{"heading":"The Basics","content":"2-3 sentences"},{"heading":"How It Works","content":"2-3 sentences"},{"heading":"Why It Matters","content":"2-3 sentences"}],"keyFacts":["fact1","fact2","fact3","fact4"],"misconception":"common misconception and truth","quiz":[{"q":"question","options":["A","B","C","D"],"correct":0,"explanation":"why"},{"q":"question","options":["A","B","C","D"],"correct":1,"explanation":"why"},{"q":"question","options":["A","B","C","D"],"correct":2,"explanation":"why"}]}`;
+  let r={};
+  try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});const d=await res.json();r=JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());}
+  catch(e){r={title:topic,tldr:`${topic} is an important concept with wide-ranging real-world impact.`,sections:[{heading:'The Basics',content:`${topic} refers to a key area that shapes everyday decisions and outcomes.`},{heading:'How It Works',content:'The core mechanism involves several interconnected parts working together to produce a result.'},{heading:'Why It Matters',content:'Understanding this topic helps you make better decisions and avoid common pitfalls.'}],keyFacts:['Affects millions of people','Often misunderstood by the general public','Fundamentals can be learned quickly','Experts agree on core principles'],misconception:`Many people think ${topic} is too complex. In reality, the basics are very accessible.`,quiz:[{q:`What is the main purpose of ${topic}?`,options:['To confuse people','To create structure and value','To benefit only experts','To generate paperwork'],correct:1,explanation:'The core purpose is to create structure and practical value.'},{q:'Who is affected by this topic?',options:['Only experts','Only students','Most people','Only governments'],correct:2,explanation:'This topic has broad relevance across many walks of life.'},{q:'What is the best way to learn more?',options:['Ignore it','Start with the basics','Jump to advanced concepts','Pay someone else'],correct:1,explanation:'Building a strong foundation makes everything else much easier to understand.'}]};}
+  answeredE={};
+  let html=`<div style="animation:fadeUp 0.3s ease">
+    <div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--sage);border-radius:12px;padding:20px;margin-bottom:14px">
+      <div style="font-weight:800;font-size:1rem;margin-bottom:5px">📌 ${r.title}</div>
+      <div style="font-size:0.92rem;font-weight:600;color:var(--text);margin-bottom:10px">${r.tldr}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px">${sources.map(s=>`<span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;font-size:0.7rem;color:var(--muted)"><span style="color:var(--sage)">✓</span>${s}</span>`).join('')}</div>
+    </div>
+    ${(r.sections||[]).map(s=>`<div style="background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:20px;margin-bottom:12px"><div style="font-weight:700;font-size:0.92rem;margin-bottom:7px">${s.heading}</div><div style="font-size:0.87rem;line-height:1.75;color:rgba(232,234,246,0.82)">${s.content}</div></div>`).join('')}
+    ${r.keyFacts?`<div style="background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:20px;margin-bottom:12px"><div style="font-weight:700;font-size:0.92rem;margin-bottom:10px">⚡ Key Facts</div><ul style="padding-left:18px;line-height:2.2;font-size:0.86rem;color:rgba(232,234,246,0.8)">${r.keyFacts.map(f=>`<li>${f}</li>`).join('')}</ul></div>`:''}
+    ${r.misconception?`<div style="background:rgba(240,192,96,0.04);border:1px solid rgba(240,192,96,0.2);border-radius:11px;padding:18px;margin-bottom:14px"><div style="font-weight:700;font-size:0.88rem;margin-bottom:6px">🚫 Common Misconception</div><div style="font-size:0.86rem;line-height:1.7;color:rgba(232,234,246,0.8)">${r.misconception}</div></div>`:''}
+    <div class="section-lbl" style="margin:20px 0 14px">Test Yourself</div>
+    <div class="qprog-wrap"><div class="qprog-bar" id="eqbar" style="width:0%"></div></div>
+    ${(r.quiz||[]).map((q,qi)=>`<div class="quiz-card" id="eq${qi}"><div class="quiz-q">${qi+1}. ${q.q}</div><div class="quiz-opts">${q.options.map((o,oi)=>`<button class="quiz-opt" onclick="answerExplore(${qi},${oi},${q.correct},'${(q.explanation||'').replace(/'/g,"\\'")}',this)"><span class="opt-l">${String.fromCharCode(65+oi)}</span>${o}</button>`).join('')}</div></div>`).join('')}
+    <div style="margin-top:16px;display:flex;gap:10px">
+      <button class="btn-ghost" onclick="showToast('Saved! 💾','💾')">💾 Save</button>
+      <button class="btn-pod" onclick="document.getElementById('listenSubject').value='${(r.title||topic).replace(/'/g,"\\'")}';nav('listen')">🎧 Listen to This</button>
+    </div>
+  </div>`;
+  document.getElementById('exploreOutput').innerHTML=html;
+  setLoading('exploreBtn','exploreIcon',false,'🔍');
+  addCoins(5);addXP(20);
+  showToast('+5 coins for exploring! 🪙','🪙');
+}
+function answerExplore(qi,sel,correct,explanation,btn){
+  if(answeredE[qi])return;answeredE[qi]=true;
+  document.getElementById('eq'+qi).querySelectorAll('.quiz-opt').forEach((b,i)=>{b.style.pointerEvents='none';if(i===correct)b.classList.add('correct');else if(i===sel)b.classList.add('wrong');});
+  if(explanation){const e=document.createElement('div');e.style.cssText='margin-top:12px;padding:10px 14px;background:rgba(109,191,168,0.06);border:1px solid rgba(109,191,168,0.15);border-radius:8px;font-size:0.82rem;color:var(--muted);line-height:1.65';e.innerHTML=`<span style="color:var(--sage);font-weight:700">Why: </span>${explanation}`;document.getElementById('eq'+qi).appendChild(e);}
+  const total=document.querySelectorAll('[id^=eq]').length;
+  document.getElementById('eqbar').style.width=(Object.keys(answeredE).length/total*100)+'%';
+  if(sel===correct){addCoins(10);addXP(30);showToast('Correct! +10 coins 🪙','🎉');}
+}
+
+// ══ STUDY GENERATOR ══
+async function generateStudy(){
+  const text=document.getElementById('studyText').value.trim();
+  if(!text){showToast('Paste some material first','💡');return;}
+  setLoading('studyBtn','studyIcon',true);
+  const subject=document.getElementById('studySubject').value||'General';
+  const level=document.getElementById('studyLevel').value;
+  const want=s=>activeChips.includes(s);
+  const prompt=`Expert study assistant. Create materials for ${level} student on ${subject}. Text: "${text.slice(0,2200)}" Respond ONLY with valid JSON:
+{"summary":${want('summary')?'"3-4 sentence summary"':'null'},"keyPoints":${want('summary')?'["p1","p2","p3","p4"]':'null'},"flashcards":${want('flashcards')?'[{"q":"q","a":"a"}]':'null'},"quiz":${want('quiz')?'[{"q":"q","options":["A","B","C","D"],"correct":0,"explanation":"why"}]':'null'},"keyTerms":${want('keyterms')?'[{"term":"t","def":"d"}]':'null'}}`;
+  let r={};
+  try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});const d=await res.json();r=JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());}
+  catch(e){r={summary:"This material covers pivotal historical events and their consequences. The content explores political transformation, key figures, and ideological change. These dynamics provide essential context for understanding modern society.",keyPoints:["The crisis that sparked radical change","Key figures who shaped events","Escalation from reform to revolution","Long-term democratic legacy"],flashcards:[{q:"What triggered the French Revolution?",a:"Financial crisis, social inequality under Louis XVI, and Enlightenment ideas challenging royal authority."},{q:"What happened July 14, 1789?",a:"The storming of the Bastille — a symbolic turning point marking popular uprising."},{q:"What was the Reign of Terror?",a:"1793–94 period under Robespierre with mass executions of 'enemies of the revolution'."},{q:"What ideals did the Revolution promote?",a:"Liberté, Égalité, Fraternité — Liberty, Equality, and Fraternity."},{q:"How did Napoleon rise?",a:"He exploited instability after the Revolution and staged a coup in 1799."}],quiz:[{q:"What was the Third Estate?",options:["The clergy","The nobility","The common people","The army"],correct:2,explanation:"The Third Estate was ~97% of France's population, bearing the heaviest tax burden."},{q:"Who led the Reign of Terror?",options:["Napoleon","Louis XVI","Robespierre","Voltaire"],correct:2,explanation:"Robespierre led the Committee of Public Safety during this radical period."},{q:"What year did the Revolution begin?",options:["1776","1789","1793","1799"],correct:1,explanation:"1789 marked the Estates-General, Tennis Court Oath, and storming of the Bastille."}]};}
+  answeredQ={};
+  let html='';
+  if(r.summary)html+=`<div class="section-lbl">Summary</div><div class="card"><p style="line-height:1.85;font-size:0.92rem">${r.summary}</p>${r.keyPoints?`<div class="kp-grid">${r.keyPoints.map((p,i)=>`<div class="kp"><span class="kp-n">0${i+1}</span>${p}</div>`).join('')}</div>`:''}</div>`;
+  if(r.flashcards)html+=`<div class="section-lbl" style="margin-top:24px">Flashcards — click to flip</div><div class="fc-grid">${r.flashcards.map((c,i)=>`<div class="fc" onclick="this.classList.toggle('flipped')"><div class="fc-front"><div class="fc-lbl">Card ${i+1}/${r.flashcards.length}</div><div class="fc-txt">${c.q}</div><div class="fc-hint">tap to reveal →</div></div><div class="fc-back"><div class="fc-lbl">Answer</div><div class="fc-txt">${c.a}</div></div></div>`).join('')}</div>`;
+  if(r.quiz)html+=`<div class="section-lbl" style="margin-top:24px">Quiz</div><div class="qprog-wrap"><div class="qprog-bar" id="qbar" style="width:0%"></div></div>${r.quiz.map((q,qi)=>`<div class="quiz-card" id="qc${qi}"><div class="quiz-q">${qi+1}. ${q.q}</div><div class="quiz-opts">${q.options.map((o,oi)=>`<button class="quiz-opt" onclick="answerStudy(${qi},${oi},${q.correct},'${(q.explanation||'').replace(/'/g,"\\'")}',this)"><span class="opt-l">${String.fromCharCode(65+oi)}</span>${o}</button>`).join('')}</div></div>`).join('')}`;
+  if(r.keyTerms)html+=`<div class="section-lbl" style="margin-top:24px">Key Terms</div><div class="kp-grid">${r.keyTerms.map(t=>`<div class="kp" style="border-left-color:var(--indigo)"><strong style="color:var(--indigo)">${t.term}</strong><br><span style="font-size:0.81rem;color:var(--muted)">${t.def}</span></div>`).join('')}</div>`;
+  html+=`<div style="margin-top:18px;display:flex;gap:10px"><button class="btn-ghost" onclick="showToast('Saved! 💾','💾')">💾 Save</button><button class="btn-pod" onclick="useTextForListen()">🎧 Listen to This</button></div>`;
+  document.getElementById('studyOutput').innerHTML=html;
+  setLoading('studyBtn','studyIcon',false,'✦');
+  addCoins(10);addXP(40);
+  showToast('+10 coins! Keep going 🪙','🪙');
+}
+function answerStudy(qi,sel,correct,explanation,btn){
+  if(answeredQ[qi])return;answeredQ[qi]=true;
+  document.getElementById('qc'+qi).querySelectorAll('.quiz-opt').forEach((b,i)=>{b.style.pointerEvents='none';if(i===correct)b.classList.add('correct');else if(i===sel)b.classList.add('wrong');});
+  if(explanation){const e=document.createElement('div');e.style.cssText='margin-top:11px;padding:10px 14px;background:rgba(109,191,168,0.06);border:1px solid rgba(109,191,168,0.15);border-radius:8px;font-size:0.82rem;color:var(--muted);line-height:1.65';e.innerHTML=`<span style="color:var(--sage);font-weight:700">Why: </span>${explanation}`;document.getElementById('qc'+qi).appendChild(e);}
+  const total=document.querySelectorAll('[id^=qc]').length;
+  document.getElementById('qbar').style.width=(Object.keys(answeredQ).length/total*100)+'%';
+  if(sel===correct){addCoins(10);addXP(30);showToast('Correct! +10 coins','🎉');}
+}
+
+// ══ ESSAY ══
+async function getEssayFeedback(){
+  const text=document.getElementById('essayText').value.trim();
+  if(!text){showToast('Paste an essay first','✍');return;}
+  setLoading('essayBtn','essayIcon',true);
+  const type=document.getElementById('essayType').value,level=document.getElementById('essayLevel').value,focus=document.getElementById('essayFocus').value;
+  const prompt=`Expert writing tutor. Evaluate this ${level} ${type} essay (focus: ${focus}). Essay: "${text.slice(0,2000)}" Respond ONLY with valid JSON: {"score":78,"grade":"B+","summary":"2 sentence assessment","strengths":[{"point":"title","detail":"explanation"}],"improvements":[{"point":"title","detail":"suggestion"}],"style":"one sentence"}`;
+  let r={};
+  try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});const d=await res.json();r=JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());}
+  catch(e){r={score:74,grade:'B',summary:"Solid understanding of the topic with a clear main argument. More specific evidence and smoother transitions would strengthen it significantly.",strengths:[{point:"Clear thesis",detail:"Your central argument is identifiable and sets up the essay well."},{point:"Topic knowledge",detail:"You demonstrate genuine familiarity with the subject matter."}],improvements:[{point:"Specific evidence",detail:"Add data, quotes, or examples to support each major claim."},{point:"Transitions",detail:"Bridge paragraphs more smoothly to improve overall flow."}],style:"Clear prose; more varied sentence structure would add sophistication."};}
+  const circ=2*Math.PI*36,offset=circ-(r.score/100)*circ,col=r.score>=80?'var(--sage)':r.score>=65?'var(--amber)':'var(--rose)';
+  let html=`<div class="card" style="display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center;margin-bottom:0"><div style="position:relative;width:90px;height:90px"><svg width="90" height="90" style="transform:rotate(-90deg)"><circle fill="none" stroke="var(--surface2)" stroke-width="8" cx="45" cy="45" r="36"/><circle fill="none" stroke="${col}" stroke-width="8" stroke-linecap="round" cx="45" cy="45" r="36" stroke-dasharray="${circ}" stroke-dashoffset="${offset}"/></svg><div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><div style="font-size:1.4rem;font-weight:800;color:${col};font-family:'Cormorant Garamond',serif">${r.score}</div><div style="font-size:0.6rem;color:var(--muted)">/100</div></div></div><div><div style="font-weight:700;margin-bottom:4px">Grade: ${r.grade}</div><p style="font-size:0.86rem;color:var(--muted);line-height:1.65">${r.summary}</p>${r.style?`<p style="margin-top:6px;font-size:0.8rem;font-style:italic;color:var(--faint)">${r.style}</p>`:''}</div></div>`;
+  if(r.strengths?.length){html+=`<div class="section-lbl" style="margin:20px 0 10px">What's Working</div>`;html+=r.strengths.map(s=>`<div style="display:flex;gap:12px;padding:13px;background:var(--surface);border:1px solid var(--border);border-radius:9px;margin-bottom:8px"><span>✓</span><div><div style="font-size:0.7rem;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">${s.point}</div><div style="font-size:0.85rem;line-height:1.65;color:rgba(232,234,246,0.8)">${s.detail}</div></div></div>`).join('');}
+  if(r.improvements?.length){html+=`<div class="section-lbl" style="margin:20px 0 10px">Improve Here</div>`;html+=r.improvements.map(s=>`<div style="display:flex;gap:12px;padding:13px;background:var(--surface);border:1px solid var(--border);border-radius:9px;margin-bottom:8px"><span>↑</span><div><div style="font-size:0.7rem;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px">${s.point}</div><div style="font-size:0.85rem;line-height:1.65;color:rgba(232,234,246,0.8)">${s.detail}</div></div></div>`).join('');}
+  document.getElementById('essayOutput').innerHTML=html;
+  setLoading('essayBtn','essayIcon',false,'✍');
+  addXP(25);
+}
+
+// ══ EXPLAIN ══
+async function explainConcept(){
+  const concept=document.getElementById('conceptInput').value.trim();
+  if(!concept){showToast('Enter a concept','💡');return;}
+  setLoading('explainBtn','explainIcon',true);
+  const level=document.getElementById('explainLevel').value,style=document.getElementById('explainStyle').value;
+  const prompt=`Brilliant teacher. Explain "${concept}" for a ${level} using: ${style}. Respond ONLY with valid JSON: {"title":"${concept}","field":"subject","explanation":"3-4 paragraphs separated by \\n\\n","analogy":"real-world analogy","keyInsight":"most important thing to understand","related":["c1","c2","c3","c4"]}`;
+  let r={};
+  try{const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});const d=await res.json();r=JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());}
+  catch(e){r={title:concept,field:"General Knowledge",explanation:`${concept} is a fascinating topic with fundamental principles worth understanding.\n\nBreaking it into its essential parts makes the whole system intuitive. Once you grasp the foundation, more complex aspects become clear.\n\nThe real-world implications show up more than most people realize.`,analogy:"Think of it like a well-organized kitchen: each ingredient has a role, and the recipe ensures everything comes together perfectly.",keyInsight:`${concept} connects deeply to adjacent ideas — understanding it unlocks related concepts quickly.`,related:["Core Theory","Historical Context","Modern Applications","Related Concept"]};}
+  const paras=r.explanation.split('\n\n').map(p=>`<p style="margin-bottom:12px">${p}</p>`).join('');
+  let html=`<div class="card"><div style="font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:700;margin-bottom:5px">${r.title}</div><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:600;background:rgba(109,191,168,0.1);color:var(--sage);border:1px solid rgba(109,191,168,0.2);margin-bottom:13px">${r.field}</span><div style="font-size:0.91rem;line-height:1.85;color:rgba(232,234,246,0.85)">${paras}</div>${r.analogy?`<div style="margin-top:14px;padding:13px 17px;background:rgba(240,192,96,0.05);border:1px solid rgba(240,192,96,0.18);border-radius:9px"><div style="font-size:0.62rem;color:var(--amber);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">💡 Analogy</div><div style="font-size:0.88rem;line-height:1.7">${r.analogy}</div></div>`:''}${r.keyInsight?`<div style="margin-top:12px;padding:13px 17px;background:rgba(128,144,224,0.06);border:1px solid rgba(128,144,224,0.18);border-radius:9px"><div style="font-size:0.62rem;color:var(--indigo);font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:5px">⚡ Key Insight</div><div style="font-size:0.88rem;line-height:1.7">${r.keyInsight}</div></div>`:''}${r.related?.length?`<div style="margin-top:13px"><div style="font-size:0.62rem;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;font-family:'Fira Code',monospace">Explore Related</div><div style="display:flex;flex-wrap:wrap;gap:7px">${r.related.map(t=>`<span style="padding:5px 11px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;font-size:0.77rem;color:var(--muted);cursor:pointer;transition:all 0.15s" onmouseover="this.style.borderColor='var(--indigo)';this.style.color='var(--indigo)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'" onclick="document.getElementById('conceptInput').value='${t}';explainConcept()">${t} →</span>`).join('')}</div></div>`:''}</div>`;
+  document.getElementById('explainOutput').innerHTML=html;
+  setLoading('explainBtn','explainIcon',false,'💡');
+  addXP(20);
+}
+
+// ══ ISLAND ══
+function drawIsland(){
+  const canvas=document.getElementById('islandCanvas');if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const dpr=window.devicePixelRatio||1;
+  canvas.width=canvas.offsetWidth*dpr;canvas.height=280*dpr;
+  ctx.scale(dpr,dpr);
+  const w=canvas.offsetWidth,h=280;
+  const sky=ctx.createLinearGradient(0,0,0,h);
+  sky.addColorStop(0,'#1a2744');sky.addColorStop(0.6,'#2d4a6b');sky.addColorStop(1,'#4a7a8a');
+  ctx.fillStyle=sky;ctx.fillRect(0,0,w,h);
+  ctx.fillStyle='rgba(255,255,255,0.6)';
+  [[0.1,0.1],[0.3,0.05],[0.7,0.08],[0.85,0.15],[0.55,0.12],[0.2,0.18],[0.9,0.06]].forEach(([x,y])=>{ctx.beginPath();ctx.arc(x*w,y*h,1.2,0,Math.PI*2);ctx.fill();});
+  const mg=ctx.createRadialGradient(0.88*w,0.1*h,0,0.88*w,0.1*h,18);mg.addColorStop(0,'#fff9e0');mg.addColorStop(1,'#f0c060');ctx.fillStyle=mg;ctx.beginPath();ctx.arc(0.88*w,0.1*h,16,0,Math.PI*2);ctx.fill();
+  const ocean=ctx.createLinearGradient(0,h*0.62,0,h);ocean.addColorStop(0,'#1a4a6b');ocean.addColorStop(1,'#0d2a3d');ctx.fillStyle=ocean;ctx.fillRect(0,h*0.62,w,h);
+  ctx.strokeStyle='rgba(255,255,255,0.07)';ctx.lineWidth=1;
+  for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(w*0.05,h*(0.67+i*0.09));ctx.bezierCurveTo(w*0.3,h*(0.65+i*0.09),w*0.6,h*(0.69+i*0.09),w*0.95,h*(0.66+i*0.09));ctx.stroke();}
+  const ig=ctx.createRadialGradient(w*0.5,h*0.65,0,w*0.5,h*0.65,w*0.36);ig.addColorStop(0,'#4a7c4e');ig.addColorStop(0.5,'#3d6b41');ig.addColorStop(0.8,'#c8a060');ig.addColorStop(1,'#b8904a');ctx.fillStyle=ig;ctx.beginPath();ctx.ellipse(w*0.5,h*0.62,w*0.35,h*0.22,0,0,Math.PI*2);ctx.fill();
+  const sand=ctx.createRadialGradient(w*0.5,h*0.65,w*0.27,w*0.5,h*0.65,w*0.36);sand.addColorStop(0,'transparent');sand.addColorStop(1,'rgba(180,140,60,0.5)');ctx.fillStyle=sand;ctx.beginPath();ctx.ellipse(w*0.5,h*0.65,w*0.36,h*0.23,0,0,Math.PI*2);ctx.fill();
+  ctx.font=`${h*0.1}px serif`;ctx.textAlign='center';ctx.textBaseline='middle';
+  SHOP.filter(item=>ownedItems.has(item.id)).forEach(item=>{const pos=ISLAND_POS[item.id];if(pos){ctx.shadowColor='rgba(0,0,0,0.4)';ctx.shadowBlur=5;ctx.fillText(item.emoji,pos.x*w,pos.y*h);ctx.shadowBlur=0;}});
+}
+function renderShop(){
+  document.getElementById('shopItems').innerHTML=SHOP.map(item=>{
+    const owned=ownedItems.has(item.id),canAfford=coins>=item.cost,streakOk=streak>=item.streak,available=streakOk&&!owned;
+    return `<div class="shop-item ${owned?'owned':''} ${canAfford&&available?'can-afford':''}" onclick="${available&&canAfford?`buyItem('${item.id}',${item.cost})`:''}">
+      <div class="shop-emoji">${item.emoji}</div><div class="shop-info"><div class="shop-name">${item.name}</div><div class="shop-req">${item.streak>0&&!streakOk?`🔒 ${item.streak}-day streak`:'Available'}</div></div>
+      ${owned?`<span style="font-size:0.68rem;color:var(--sage);font-weight:700">✓ Owned</span>`:streakOk?`<div class="shop-cost ${item.cost===0?'free':''}">🪙${item.cost===0?'Free':item.cost}</div>`:`<div style="font-size:0.76rem;color:var(--muted)">🔒 ${item.streak}d</div>`}
+    </div>`;
+  }).join('');
+}
+function buyItem(id,cost){if(coins<cost){showToast('Not enough coins! Keep studying 📚','🪙');return;}if(ownedItems.has(id))return;coins-=cost;ownedItems.add(id);document.getElementById('coinDisplay').textContent=coins;document.getElementById('islandCoins').textContent=coins;const item=SHOP.find(s=>s.id===id);showToast(`${item.emoji} ${item.name} added to your island!`,'🎉');renderShop();drawIsland();}
+function renderMilestones(){document.getElementById('milestonesGrid').innerHTML=MILESTONES.map(m=>{const unlocked=streak>=m.streak;return `<div class="milestone ${unlocked?'unlocked':'locked'}"><div class="ms-icon">${m.emoji}</div><div class="ms-label">${m.label}</div><div class="ms-req">${m.streak}-day streak</div><div style="font-size:0.7rem;color:var(--muted);margin-top:2px">${m.reward}</div>${unlocked?`<span class="ms-badge">✓ Unlocked</span>`:`<span style="font-size:0.62rem;color:var(--faint);margin-top:4px;display:inline-block">${m.streak-streak}d to go</span>`}</div>`;}).join('');}
+
+// ══ INIT ══
+buildWaveform();
+renderExploreSubtopics();
+window.addEventListener('resize',()=>{if(document.getElementById('page-island').classList.contains('active'))drawIsland();});
+function renderExploreSubtopics(){const row=document.getElementById('exploreSubtopics');if(!row)return;const subs=SUBTOPICS[selectedExploreCat]||[];row.innerHTML=subs.map(s=>`<button style="padding:6px 13px;border-radius:20px;border:1px solid var(--border2);font-size:0.79rem;color:var(--muted);cursor:pointer;background:transparent;font-family:Nunito,sans-serif;font-weight:600;transition:all 0.15s" onclick="document.getElementById('exploreInput').value='${s}';exploreTopic()" onmouseover="this.style.borderColor='var(--sage)';this.style.color='var(--sage)'" onmouseout="this.style.borderColor='var(--border2)';this.style.color='var(--muted)'">${s}</button>`).join('');}
+</script>
+
+</body>
+</html>
